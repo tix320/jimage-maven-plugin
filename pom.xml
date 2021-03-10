@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.tix320</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>0.3.0</version>
+	</parent>
+
+	<artifactId>jimage-maven-plugin</artifactId>
+	<version>0.1.0</version>
+	<packaging>maven-plugin</packaging>
+
+	<name>JImage Maven Plugin</name>
+	<description>jlink and jpackage maven plugin</description>
+	<url>https://github.com/tix320/jimage-maven-plugin</url>
+
+	<scm>
+		<url>https://github.com/jimage-maven-plugin/tree/master</url>
+		<connection>scm:git:https://github.com/jimage-maven-plugin.git</connection>
+		<developerConnection>scm:git:https://github.com/jimage-maven-plugin.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>tix320</id>
+			<name>Tigran Sargsyan</name>
+			<email>tixtix320@gmail.com</email>
+			<timezone>UTC+4</timezone>
+		</developer>
+	</developers>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>3.6.0</version>
+				<configuration>
+				</configuration>
+				<executions>
+					<execution>
+						<id>mojo-descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>help-goal</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>3.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>3.6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-project</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.zeroturnaround</groupId>
+			<artifactId>zt-zip</artifactId>
+			<version>1.14</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+
+</project>
