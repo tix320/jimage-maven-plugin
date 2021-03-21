@@ -37,9 +37,6 @@ public class JlinkOptions {
 	}
 
 	public void setVerbose(Boolean verbose) {
-		if (true) {
-			throw new RuntimeException(verbose + "");
-		}
 		this.verbose = verbose;
 	}
 
@@ -48,9 +45,6 @@ public class JlinkOptions {
 	}
 
 	public void setModulePaths(Set<String> modulePaths) {
-		if (true) {
-			throw new RuntimeException(verbose + "");
-		}
 		this.modulePaths = new HashSet<>();
 		if (modulePaths != null) {
 			this.modulePaths.addAll(modulePaths);
@@ -84,9 +78,6 @@ public class JlinkOptions {
 	}
 
 	public void setCompression(Integer compression) {
-		if (true) {
-			throw new RuntimeException(compression + "");
-		}
 		this.compression = compression;
 	}
 
@@ -157,6 +148,8 @@ public class JlinkOptions {
 
 		if (launcher == null) {
 			launcher = jlinkOptions.launcher;
+		} else {
+			launcher.fillFrom(jlinkOptions.launcher);
 		}
 
 		if (outputPath == null) {

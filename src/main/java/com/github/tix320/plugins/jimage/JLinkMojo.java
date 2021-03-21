@@ -2,6 +2,8 @@ package com.github.tix320.plugins.jimage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,7 +33,7 @@ public class JLinkMojo extends AbstractMojo {
 	private Map<String, JlinkOptions> images;
 
 	@Parameter
-	private boolean createZip;
+	private ZipOptions zipOptions;
 
 	@Parameter(readonly = true, defaultValue = "${project}")
 	private MavenProject project;
@@ -98,15 +100,38 @@ public class JLinkMojo extends AbstractMojo {
 					"Jlink command failed with arguments: " + args + ". See Jlink output for details.");
 		}
 
-		if (createZip) {
-			File outputFile = new File(jlinkOptions.getOutputPath());
+		File outputFile = new File(jlinkOptions.getOutputPath());
+
+
+		final Launcher launcher = jlinkOptions.getLauncher();
+		if (launcher != null && !launcher.getVmOptions().isEmpty()) {
+			getLog().info("Injecting launcher VM options: " + launcher.getVmOptions());
+			final String command = launcher.getCommand();
+			final Path launcherPath = outputFile.toPath().resolve("bin").resolve(command);
+			final String vmOptionsString = String.join(" ", launcher.getVmOptions());
+			try {
+				final String target = "JLINK_VM_OPTIONS=";
+				final String replacement = target + vmOptionsString;
+				FilesUtils.replaceInFile(launcherPath, target, replacement);
+
+				final Path batLauncher = Path.of(launcherPath.toString() + ".bat");
+				if (Files.exists(batLauncher)) {
+					FilesUtils.replaceInFile(batLauncher, target, replacement);
+				}
+
+			} catch (IOException e) {
+				throw new MojoFailureException("Failed to inject VM options to launcher", e);
+			}
+		}
+
+		if (zipOptions != null && zipOptions.isEnable()) {
 			String parentDirectory = outputFile.getParent();
 			String outputFileName = outputFile.getName();
 			String zipPath = parentDirectory + File.separator + outputFileName + ".zip";
 
 			getLog().info(String.format("Creating zip of image in: %s", zipPath));
 
-			ZipUtil.pack(outputFile, new File(zipPath), true);
+			ZipUtil.pack(outputFile, new File(zipPath), zipOptions.preserveRootFolder());
 		}
 	}
 
