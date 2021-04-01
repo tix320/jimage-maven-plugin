@@ -1,10 +1,7 @@
 package com.github.tix320.plugins.jimage;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author : Tigran Sargsyan
@@ -12,105 +9,28 @@ import java.util.Set;
  **/
 public class JlinkOptions {
 
-	private Boolean verbose;
+	private boolean verbose;
 
-	private Set<String> modulePaths = new HashSet<>();
+	private Map<String, String> modulePaths = new HashMap<>();
 
-	private Set<String> rootModules = new HashSet<>();
+	private Map<String, String> rootModules = new HashMap<>();
 
-	private Set<String> options = new HashSet<>();
+	private Map<String, String> options = new HashMap<>();
 
-	private Integer compression;
+	private int compression = 0;
 
-	private Boolean noHeaderFiles;
+	private boolean noHeaderFiles;
 
-	private Boolean noManPages;
+	private boolean noManPages;
 
-	private Boolean stripDebug;
+	private boolean stripDebug;
 
 	private Launcher launcher;
 
 	private String outputPath;
 
-	public Boolean getVerbose() {
-		return verbose;
-	}
-
-	public void setVerbose(Boolean verbose) {
-		this.verbose = verbose;
-	}
-
-	public Set<String> getModulePaths() {
-		return modulePaths;
-	}
-
-	public void setModulePaths(Set<String> modulePaths) {
-		this.modulePaths = new HashSet<>();
-		if (modulePaths != null) {
-			this.modulePaths.addAll(modulePaths);
-		}
-	}
-
-	public Set<String> getRootModules() {
-		return rootModules;
-	}
-
-	public void setRootModules(Set<String> rootModules) {
-		this.rootModules = new HashSet<>();
-		if (rootModules != null) {
-			this.rootModules.addAll(rootModules);
-		}
-	}
-
-	public Set<String> getOptions() {
-		return options;
-	}
-
-	public void setOptions(Set<String> options) {
-		this.options = new HashSet<>();
-		if (options != null) {
-			this.options.addAll(options);
-		}
-	}
-
-	public Integer getCompression() {
-		return compression;
-	}
-
-	public void setCompression(Integer compression) {
-		this.compression = compression;
-	}
-
-	public Boolean getNoHeaderFiles() {
-		return noHeaderFiles;
-	}
-
-	public void setNoHeaderFiles(Boolean noHeaderFiles) {
-		this.noHeaderFiles = noHeaderFiles;
-	}
-
-	public Boolean getNoManPages() {
-		return noManPages;
-	}
-
-	public void setNoManPages(Boolean noManPages) {
-		this.noManPages = noManPages;
-	}
-
-	public Boolean getStripDebug() {
-		return stripDebug;
-	}
-
-	public void setStripDebug(Boolean stripDebug) {
-		this.stripDebug = stripDebug;
-	}
-
 	public Launcher getLauncher() {
 		return launcher;
-	}
-
-	public void setLauncher(Launcher launcher) {
-		this.launcher = launcher;
 	}
 
 	public String getOutputPath() {
@@ -121,72 +41,36 @@ public class JlinkOptions {
 		this.outputPath = outputPath;
 	}
 
-	public void fillFrom(JlinkOptions jlinkOptions) {
-		if (verbose == null) {
-			verbose = jlinkOptions.verbose;
-		}
-
-		modulePaths.addAll(jlinkOptions.modulePaths);
-		rootModules.addAll(jlinkOptions.rootModules);
-		options.addAll(jlinkOptions.options);
-
-		if (compression == null) {
-			compression = jlinkOptions.compression;
-		}
-
-		if (noHeaderFiles == null) {
-			noHeaderFiles = jlinkOptions.noHeaderFiles;
-		}
-
-		if (noManPages == null) {
-			noManPages = jlinkOptions.noManPages;
-		}
-
-		if (stripDebug == null) {
-			stripDebug = jlinkOptions.stripDebug;
-		}
-
-		if (launcher == null) {
-			launcher = jlinkOptions.launcher;
-		} else {
-			launcher.fillFrom(jlinkOptions.launcher);
-		}
-
-		if (outputPath == null) {
-			outputPath = jlinkOptions.outputPath;
-		}
-	}
-
 	public List<String> toArgs() throws ValidationException {
 		List<String> args = new ArrayList<>();
 
-		if (verbose != null && verbose) {
+		if (verbose) {
 			args.add("--verbose");
 		}
 
 		args.add("--compress");
 		args.add(String.valueOf(compression));
 
-		if (noHeaderFiles != null && noHeaderFiles) {
+		if (noHeaderFiles) {
 			args.add("--no-header-files");
 		}
 
-		if (noManPages != null && noManPages) {
+		if (noManPages) {
 			args.add("--no-man-pages");
 		}
 
-		if (stripDebug != null && stripDebug) {
+		if (stripDebug) {
 			args.add("--strip-debug");
 		}
 
 		if (modulePaths.isEmpty()) {
 			throw new ValidationException("At least one module path must be specified.");
 		} else {
-			if (modulePaths.contains(null)) {
-				throw new ValidationException("`null` value in modulePaths");
+			if (modulePaths.containsValue(null)) {
+				throw new ValidationException("`null` value in modulePaths: " + modulePaths);
 			}
 
-			String modulePaths = String.join(File.pathSeparator, this.modulePaths);
+			String modulePaths = String.join(File.pathSeparator, new HashSet<>(this.modulePaths.values()));
 			args.add("--module-path");
 			args.add(modulePaths);
 		}
@@ -194,13 +78,13 @@ public class JlinkOptions {
 		if (rootModules.isEmpty()) {
 			throw new ValidationException("At least one root module must be specified.");
 		} else {
-			String modules = String.join(File.pathSeparator, this.rootModules);
+			String modules = String.join(File.pathSeparator, new HashSet<>(this.rootModules.values()));
 			args.add("--add-modules");
 			args.add(modules);
 		}
 
 		if (!options.isEmpty()) {
-			String options = String.join(" ", this.options);
+			String options = String.join(" ", new HashSet<>(this.options.values()));
 
 			args.add("--add-options");
 			args.add(options);
