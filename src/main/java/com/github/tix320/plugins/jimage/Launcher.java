@@ -1,6 +1,8 @@
 package com.github.tix320.plugins.jimage;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,28 +17,9 @@ public class Launcher {
 
 	private String mainClass;
 
-	private Set<String> vmOptions = new HashSet<>();
+	private Map<String, String> vmOptions = new HashMap<>();
 
 	public Launcher() {
-	}
-
-	public void setCommand(String command) {
-		this.command = command;
-	}
-
-	public void setMainModule(String mainModule) {
-		this.mainModule = mainModule;
-	}
-
-	public void setMainClass(String mainClass) {
-		this.mainClass = mainClass;
-	}
-
-	public void setVmOptions(Set<String> vmOptions) {
-		this.vmOptions = new HashSet<>();
-		if (vmOptions != null) {
-			this.vmOptions.addAll(vmOptions);
-		}
 	}
 
 	public String getCommand() {
@@ -52,7 +35,7 @@ public class Launcher {
 	}
 
 	public Set<String> getVmOptions() {
-		return vmOptions;
+		return new HashSet<>(vmOptions.values());
 	}
 
 	public void validate() throws ValidationException {
@@ -69,19 +52,20 @@ public class Launcher {
 		}
 	}
 
-	public void fillFrom(Launcher launcher) {
-		if (command == null) {
-			command = launcher.command;
-		}
-
-		if (mainModule == null) {
-			mainModule = launcher.mainModule;
-		}
-
-		if (mainClass == null) {
-			mainClass = launcher.mainClass;
-		}
-
-		vmOptions.addAll(launcher.vmOptions);
+	@Override
+	public String toString() {
+		return "Launcher{"
+			   + "command='"
+			   + command
+			   + '\''
+			   + ", mainModule='"
+			   + mainModule
+			   + '\''
+			   + ", mainClass='"
+			   + mainClass
+			   + '\''
+			   + ", vmOptions="
+			   + vmOptions
+			   + '}';
 	}
 }

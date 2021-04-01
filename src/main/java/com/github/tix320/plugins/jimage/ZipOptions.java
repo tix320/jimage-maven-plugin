@@ -10,15 +10,12 @@ public class ZipOptions {
 		return enable;
 	}
 
-	public void setEnable(boolean enable) {
-		this.enable = enable;
-	}
-
 	public boolean preserveRootFolder() {
 		return preserveRootFolder;
 	}
 
-	public void setPreserveRootFolder(boolean preserveRootFolder) {
-		this.preserveRootFolder = preserveRootFolder;
+	@Override
+	public String toString() {
+		return "ZipOptions{" + "enable=" + enable + ", preserveRootFolder=" + preserveRootFolder + '}';
 	}
 }

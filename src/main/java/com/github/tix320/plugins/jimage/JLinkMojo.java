@@ -4,15 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.spi.ToolProvider;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -23,14 +22,11 @@ import org.zeroturnaround.zip.ZipUtil;
  * @author : Tigran Sargsyan
  * @since : 09.03.2021
  **/
-@Mojo(name = "jlink", defaultPhase = LifecyclePhase.PACKAGE)
+@Mojo(name = "jlink")
 public class JLinkMojo extends AbstractMojo {
 
 	@Parameter
 	private JlinkOptions jlinkOptions;
-
-	@Parameter
-	private Map<String, JlinkOptions> images;
 
 	@Parameter
 	private ZipOptions zipOptions;
@@ -50,36 +46,12 @@ public class JLinkMojo extends AbstractMojo {
 			throw new MojoExecutionException("JLink tool not found in current JDK.");
 		}
 
-		String defaultOutputDirectory = preserveDefaultOutputDirectory();
-
-		if (images == null || images.isEmpty()) {
-			if (jlinkOptions.getOutputPath() == null) {
-				jlinkOptions.setOutputPath(defaultOutputDirectory);
-			}
-
-			createJlinkImage(jlinkOptions);
-		} else {
-			for (Entry<String, JlinkOptions> entry : images.entrySet()) {
-				String name = entry.getKey();
-				JlinkOptions jlinkOptions = entry.getValue();
-
-				if (jlinkOptions == null) {
-					throw new MojoFailureException(String.format("Image config with name `%s` is invalid.", name));
-				}
-
-				if (jlinkOptions.getOutputPath() == null) {
-					jlinkOptions.setOutputPath(defaultOutputDirectory + File.separator + name);
-				}
-
-				if (this.jlinkOptions != null) {
-					jlinkOptions.fillFrom(this.jlinkOptions);
-				}
-
-				getLog().info(String.format("Creating image: `%s`", name));
-
-				createJlinkImage(jlinkOptions);
-			}
+		if (jlinkOptions.getOutputPath() == null) {
+			String defaultOutputDirectory = preserveDefaultOutputDirectory();
+			jlinkOptions.setOutputPath(defaultOutputDirectory);
 		}
+
+		createJlinkImage(jlinkOptions);
 	}
 
 	private void createJlinkImage(JlinkOptions jlinkOptions) throws MojoFailureException {
@@ -105,10 +77,11 @@ public class JLinkMojo extends AbstractMojo {
 
 		final Launcher launcher = jlinkOptions.getLauncher();
 		if (launcher != null && !launcher.getVmOptions().isEmpty()) {
-			getLog().info("Injecting launcher VM options: " + launcher.getVmOptions());
+			final Set<String> vmOptions = new HashSet<>(launcher.getVmOptions());
+			getLog().info("Injecting launcher VM options: " + vmOptions);
 			final String command = launcher.getCommand();
 			final Path launcherPath = outputFile.toPath().resolve("bin").resolve(command);
-			final String vmOptionsString = String.join(" ", launcher.getVmOptions());
+			final String vmOptionsString = String.join(" ", vmOptions);
 			try {
 				final String target = "JLINK_VM_OPTIONS=";
 				final String replacement = target + vmOptionsString;
@@ -137,19 +110,19 @@ public class JLinkMojo extends AbstractMojo {
 
 	private String preserveDefaultOutputDirectory() throws MojoFailureException {
 		String targetDirectory = project.getModel().getBuild().getDirectory();
-		String output = targetDirectory + File.separator + "jlink";
+		final Path outputPath = Path.of(targetDirectory, "jlink", "default");
 
-		File outputFile = new File(output);
+		File outputFile = outputPath.toFile();
 		if (outputFile.exists() && !outputFile.isDirectory()) {
-			throw new MojoFailureException("Output is not a directory: " + output);
+			throw new MojoFailureException("Output is not a directory: " + outputPath);
 		} else {
 			try {
 				FileUtils.forceDelete(outputFile);
 			} catch (IOException e) {
-				throw new MojoFailureException("Unable to delete output directory: " + output);
+				throw new MojoFailureException("Unable to delete output directory: " + outputPath);
 			}
 		}
 
-		return output;
+		return outputPath.toString();
 	}
 }
