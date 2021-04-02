@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>jimage-maven-plugin</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>JImage Maven Plugin</name>
@@ -79,6 +79,11 @@
 			<artifactId>zt-zip</artifactId>
 			<version>1.14</version>
 			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tix320</groupId>
+			<artifactId>deft</artifactId>
+			<version>0.3.0</version>
 		</dependency>
 	</dependencies>
 

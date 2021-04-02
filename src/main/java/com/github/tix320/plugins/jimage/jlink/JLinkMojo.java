@@ -1,21 +1,24 @@
-package com.github.tix320.plugins.jimage;
+package com.github.tix320.plugins.jimage.jlink;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.spi.ToolProvider;
 
+import com.github.tix320.plugins.jimage.common.FilesUtils;
+import com.github.tix320.plugins.jimage.common.ToolUtils;
+import com.github.tix320.plugins.jimage.common.ValidationException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 /**
@@ -112,15 +115,12 @@ public class JLinkMojo extends AbstractMojo {
 		String targetDirectory = project.getModel().getBuild().getDirectory();
 		final Path outputPath = Path.of(targetDirectory, "jlink", "default");
 
-		File outputFile = outputPath.toFile();
-		if (outputFile.exists() && !outputFile.isDirectory()) {
+		try {
+			FilesUtils.preserveDirectory(outputPath);
+		} catch (NotDirectoryException e) {
 			throw new MojoFailureException("Output is not a directory: " + outputPath);
-		} else {
-			try {
-				FileUtils.forceDelete(outputFile);
-			} catch (IOException e) {
-				throw new MojoFailureException("Unable to delete output directory: " + outputPath);
-			}
+		} catch (IOException e) {
+			throw new MojoFailureException("Unable to delete output directory: " + outputPath, e);
 		}
 
 		return outputPath.toString();

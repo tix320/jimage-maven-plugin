@@ -1,9 +1,11 @@
-package com.github.tix320.plugins.jimage;
+package com.github.tix320.plugins.jimage.jlink;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.github.tix320.plugins.jimage.common.ValidationException;
 
 /**
  * @author : Tigran Sargsyan
