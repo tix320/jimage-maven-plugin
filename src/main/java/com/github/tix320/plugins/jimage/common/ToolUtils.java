@@ -1,4 +1,4 @@
-package com.github.tix320.plugins.jimage;
+package com.github.tix320.plugins.jimage.common;
 
 import java.io.*;
 import java.util.concurrent.CompletableFuture;

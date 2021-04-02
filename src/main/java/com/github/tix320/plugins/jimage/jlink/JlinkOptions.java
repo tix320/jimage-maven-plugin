@@ -1,13 +1,16 @@
-package com.github.tix320.plugins.jimage;
+package com.github.tix320.plugins.jimage.jlink;
 
 import java.io.File;
 import java.util.*;
+
+import com.github.tix320.plugins.jimage.common.Options;
+import com.github.tix320.plugins.jimage.common.ValidationException;
 
 /**
  * @author : Tigran Sargsyan
  * @since : 10.03.2021
  **/
-public class JlinkOptions {
+public class JlinkOptions implements Options {
 
 	private boolean verbose;
 
@@ -41,6 +44,7 @@ public class JlinkOptions {
 		this.outputPath = outputPath;
 	}
 
+	@Override
 	public List<String> toArgs() throws ValidationException {
 		List<String> args = new ArrayList<>();
 
